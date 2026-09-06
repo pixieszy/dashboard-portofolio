@@ -14,146 +14,196 @@
   <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     body { font-family: 'Inter', sans-serif; }
+    
+    /* Smooth Typing Caret */
+    .typing-cursor::after {
+      content: '|';
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
   </style>
 </head>
-<body class="bg-[#0f172a] text-slate-400 selection:bg-teal-300 selection:text-teal-900 leading-relaxed antialiased">
+<body class="bg-[#0f172a] text-slate-400 selection:bg-teal-300 selection:text-teal-900 leading-relaxed antialiased relative overflow-x-hidden">
 
-  <div id="app" class="mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24 lg:py-0">
-    <div class="lg:flex lg:justify-between lg:gap-4">
-      
-      <!-- LEFT SIDEBAR (FIXED / STICKY) -->
-      <header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-24">
-        <div>
-          <!-- Nama & Perkenalan -->
-          <h1 class="text-3xl font-bold tracking-tight text-slate-200 sm:text-4xl">
-            <a href="#">Nur Izdihar Idris Yunus</a>
-          </h1>
-          <h2 class="mt-2 text-base font-medium tracking-tight text-teal-300 sm:text-lg">
-            Fresh Graduate Sarjana Komputer
-          </h2>
-          <p class="mt-4 max-w-xs text-xs leading-normal text-slate-400">
-            Komunikatif, berorientasi pada pemecahan masalah teknis, troubleshooting sistem, infrastruktur IT, serta pengembangan aplikasi.
-          </p>
+  <div id="app" @mousemove="updateSpotlight" class="relative">
+    
+    <!-- MOUSE SPOTLIGHT EFFECT -->
+    <div 
+      class="pointer-events-none fixed -inset-px z-30 transition duration-300 hidden lg:block"
+      :style="{
+        background: `radial-gradient(600px at ${mouseX}px ${mouseY}px, rgba(29, 78, 216, 0.15), transparent 80%)`
+      }">
+    </div>
 
-          <!-- NAV LINKS (Scrollspy Fixed) -->
-          <nav class="nav hidden lg:block mt-12" aria-label="In-page jump links">
-            <ul class="w-max space-y-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-              <li>
-                <a href="#about" class="group flex items-center py-1 transition-all" :class="activeSection === 'about' ? 'text-slate-200' : 'hover:text-slate-200'">
-                  <span class="mr-4 h-px transition-all bg-slate-600 group-hover:w-16 group-hover:bg-slate-200" :class="activeSection === 'about' ? 'w-16 bg-slate-200' : 'w-8'"></span>
-                  <span>ABOUT</span>
-                </a>
-              </li>
-              <li>
-                <a href="#projects" class="group flex items-center py-1 transition-all" :class="activeSection === 'projects' ? 'text-slate-200' : 'hover:text-slate-200'">
-                  <span class="mr-4 h-px transition-all bg-slate-600 group-hover:w-16 group-hover:bg-slate-200" :class="activeSection === 'projects' ? 'w-16 bg-slate-200' : 'w-8'"></span>
-                  <span>PROJECTS</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        <!-- SOCIAL LINKS -->
-        <ul class="ml-1 mt-8 flex items-center space-x-5 text-slate-400">
-          <li>
-            <a :href="'https://github.com/' + githubUsername" target="_blank" class="hover:text-slate-200 transition">
-              <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
-            </a>
-          </li>
-        </ul>
-      </header>
-
-      <!-- RIGHT CONTENT AREA (SCROLLABLE) -->
-      <main class="pt-24 lg:w-1/2 lg:py-24 space-y-24">
+    <div class="mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24 lg:py-0">
+      <div class="lg:flex lg:justify-between lg:gap-4">
         
-        <!-- ABOUT SECTION -->
-        <section id="about" class="scroll-mt-16 lg:scroll-mt-24 space-y-4 text-sm leading-relaxed text-slate-400">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-[#0f172a]/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-0 lg:w-auto lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">About</h2>
-          </div>
-          <p>
-            Saya adalah seorang <span class="text-slate-200 font-medium">Fresh graduate Sarjana Komputer</span> yang komunikatif dan berorientasi pada pemecahan masalah teknis.
-          </p>
-          <p>
-            Saya menguasai dasar-dasar infrastruktur IT, troubleshooting sistem, manajemen layanan, serta memiliki pengalaman praktis dalam merancang aplikasi desktop dan web menggunakan <span class="text-teal-300 font-mono">PHP</span>, <span class="text-teal-300 font-mono">JavaScript</span>, <span class="text-teal-300 font-mono">Java/C#</span>, dan <span class="text-teal-300 font-mono">Python</span>, didukung manajemen basis data <span class="text-teal-300 font-mono">MySQL / PostgreSQL</span>.
-          </p>
-          <p>
-            Saya mampu beradaptasi dengan cepat terhadap teknologi baru dan siap berkontribusi langsung dalam menjaga keandalan serta pengembangan sistem teknis perusahaan.
-          </p>
-        </section>
+        <!-- LEFT SIDEBAR (FIXED / STICKY) -->
+        <header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-24">
+          <div>
+            <!-- Nama Lengkap -->
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-100 sm:text-4xl lg:text-5xl">
+              <a href="#">Nur Izdihar Idris Yunus</a>
+            </h1>
 
-        <!-- DYNAMIC GITHUB PROJECTS SECTION -->
-        <section id="projects" class="scroll-mt-16 lg:scroll-mt-24 space-y-12">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-[#0f172a]/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-0 lg:w-auto lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">Projects</h2>
-          </div>
+            <!-- Animasi Dynamic Subtitle (Typing Effect) -->
+            <div class="mt-3 text-base sm:text-lg font-semibold text-teal-300 h-8 flex items-center">
+              <span>{{ currentRole }}</span>
+              <span class="typing-cursor text-teal-300 ml-0.5"></span>
+            </div>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="text-xs text-slate-500 py-4 flex items-center space-x-2">
-            <div class="w-2 h-2 bg-teal-400 rounded-full animate-ping"></div>
-            <span>Memuat repositori dari GitHub...</span>
-          </div>
+            <p class="mt-4 max-w-xs text-xs leading-relaxed text-slate-400">
+              Sarjana Komputer yang komunikatif, adaptif, dan siap menjaga keandalan serta pengembangan sistem teknis perusahaan.
+            </p>
 
-          <!-- Error State -->
-          <div v-else-if="error" class="text-xs text-rose-400 py-4">
-            Gagal memuat repositori: {{ error }}
-          </div>
-
-          <!-- Dynamic Projects List -->
-          <div v-else class="space-y-8">
-            <div 
-              v-for="repo in projects" 
-              :key="repo.id" 
-              class="group relative grid gap-4 p-5 rounded-2xl border border-slate-800 bg-slate-800/30 hover:bg-slate-800/60 hover:border-slate-700 transition"
-            >
-              <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                  <h3 class="font-medium text-slate-200 group-hover:text-teal-300 text-base capitalize">
-                    {{ formatTitle(repo.name) }}
-                  </h3>
-                  <a 
-                    :href="repo.html_url" 
-                    target="_blank" 
-                    class="text-xs text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1 border border-teal-500/30 bg-teal-500/10 px-3 py-1 rounded-full transition"
-                  >
-                    <span>View Repository</span>
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            <!-- NAV LINKS -->
+            <nav class="nav hidden lg:block mt-12" aria-label="In-page jump links">
+              <ul class="w-max space-y-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+                <li>
+                  <a href="#about" class="group flex items-center py-1 transition-all" :class="activeSection === 'about' ? 'text-slate-200' : 'hover:text-slate-200'">
+                    <span class="mr-4 h-px transition-all bg-slate-600 group-hover:w-16 group-hover:bg-slate-200" :class="activeSection === 'about' ? 'w-16 bg-slate-200' : 'w-8'"></span>
+                    <span>ABOUT ME</span>
                   </a>
-                </div>
+                </li>
+                <li>
+                  <a href="#projects" class="group flex items-center py-1 transition-all" :class="activeSection === 'projects' ? 'text-slate-200' : 'hover:text-slate-200'">
+                    <span class="mr-4 h-px transition-all bg-slate-600 group-hover:w-16 group-hover:bg-slate-200" :class="activeSection === 'projects' ? 'w-16 bg-slate-200' : 'w-8'"></span>
+                    <span>GITHUB PROJECTS</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
 
-                <p class="text-xs text-slate-400 leading-relaxed">
-                  {{ repo.description || 'Repositori kode sistem & aplikasi.' }}
-                </p>
+          <!-- SOCIAL LINKS -->
+          <ul class="ml-1 mt-8 flex items-center space-x-5 text-slate-400">
+            <li>
+              <a :href="'https://github.com/' + githubUsername" target="_blank" class="hover:text-slate-100 transition transform hover:scale-110 inline-block">
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+              </a>
+            </li>
+          </ul>
+        </header>
 
-                <!-- Tags / Tech Stack -->
-                <div class="flex flex-wrap gap-1.5 pt-1">
-                  <span v-if="repo.language" class="rounded-full bg-teal-400/10 px-3 py-1 text-[11px] font-medium text-teal-300 border border-teal-400/20">
-                    {{ repo.language }}
-                  </span>
-                  <span v-for="topic in repo.topics" :key="topic" class="rounded-full bg-slate-700/50 px-3 py-1 text-[11px] font-medium text-slate-300">
-                    {{ topic }}
-                  </span>
+        <!-- RIGHT CONTENT AREA -->
+        <main class="pt-24 lg:w-1/2 lg:py-24 space-y-20">
+          
+          <!-- ABOUT SECTION -->
+          <section id="about" class="scroll-mt-16 lg:scroll-mt-24 space-y-6 text-sm leading-relaxed text-slate-400">
+            <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-[#0f172a]/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-0 lg:w-auto lg:opacity-0">
+              <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">About</h2>
+            </div>
+
+            <!-- Paragraph Introductions -->
+            <div class="space-y-4">
+              <p>
+                Saya adalah lulusan baru <span class="text-slate-100 font-semibold underline decoration-teal-400 decoration-2 underline-offset-4">Sarjana Komputer</span> yang menggabungkan kemampuan pemecahan masalah teknis secara logis dengan komunikasi yang efektif.
+              </p>
+              <p>
+                Fokus utama saya terletak pada keandalan <span class="text-slate-200 font-medium">infrastruktur IT</span>, <span class="text-slate-200 font-medium">troubleshooting sistem</span>, serta pengembangan aplikasi desktop dan web yang terstruktur dengan baik.
+              </p>
+            </div>
+
+            <!-- Key Highlight Cards -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <div class="p-3.5 rounded-xl border border-slate-800 bg-slate-800/40 hover:border-slate-700 transition">
+                <p class="text-[11px] font-bold text-teal-400 uppercase tracking-wider">Pendidikan</p>
+                <p class="text-xs font-semibold text-slate-200 mt-1">S1 Ilmu Komputer</p>
+                <p class="text-[11px] text-slate-400">Fresh Graduate</p>
+              </div>
+              <div class="p-3.5 rounded-xl border border-slate-800 bg-slate-800/40 hover:border-slate-700 transition">
+                <p class="text-[11px] font-bold text-teal-400 uppercase tracking-wider">Keahlian Utama</p>
+                <p class="text-xs font-semibold text-slate-200 mt-1">IT Support & Software</p>
+                <p class="text-[11px] text-slate-400">System Troubleshooting</p>
+              </div>
+            </div>
+
+            <!-- Interactive Skills Badges -->
+            <div class="space-y-3 pt-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Teknologi & Tools Yang Dikuasai</h3>
+              <div class="flex flex-wrap gap-2">
+                <span v-for="skill in skills" :key="skill" class="px-3 py-1 rounded-lg text-xs font-mono font-medium bg-slate-800/80 border border-slate-700/60 text-slate-300 hover:text-teal-300 hover:border-teal-400/50 hover:bg-teal-500/10 transition cursor-default">
+                  {{ skill }}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <!-- DYNAMIC GITHUB PROJECTS SECTION -->
+          <section id="projects" class="scroll-mt-16 lg:scroll-mt-24 space-y-12">
+            <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-[#0f172a]/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-0 lg:w-auto lg:opacity-0">
+              <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">Projects</h2>
+            </div>
+
+            <!-- Loading State -->
+            <div v-if="loading" class="text-xs text-slate-500 py-4 flex items-center space-x-2">
+              <div class="w-2 h-2 bg-teal-400 rounded-full animate-ping"></div>
+              <span>Memuat repositori dari GitHub...</span>
+            </div>
+
+            <!-- Error State -->
+            <div v-else-if="error" class="text-xs text-rose-400 py-4">
+              Gagal memuat repositori: {{ error }}
+            </div>
+
+            <!-- Dynamic Projects List -->
+            <div v-else class="space-y-6">
+              <div 
+                v-for="repo in projects" 
+                :key="repo.id" 
+                class="group relative p-5 rounded-2xl border border-slate-800 bg-slate-800/30 hover:bg-slate-800/60 hover:border-slate-700/80 transition duration-300"
+              >
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-100 group-hover:text-teal-300 text-base capitalize tracking-wide">
+                      {{ formatTitle(repo.name) }}
+                    </h3>
+                    <a 
+                      :href="repo.html_url" 
+                      target="_blank" 
+                      class="text-xs text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1 border border-teal-500/30 bg-teal-500/10 px-3 py-1 rounded-full transition hover:bg-teal-500/20"
+                    >
+                      <span>View Code</span>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                  </div>
+
+                  <p class="text-xs text-slate-400 leading-relaxed">
+                    {{ repo.description || 'Proyek pengembangan perangkat lunak berbasis repositori GitHub.' }}
+                  </p>
+
+                  <!-- Tags / Tech Stack -->
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    <span v-if="repo.language" class="rounded-full bg-teal-400/10 px-3 py-0.5 text-[11px] font-mono font-medium text-teal-300 border border-teal-400/20">
+                      {{ repo.language }}
+                    </span>
+                    <span v-for="topic in repo.topics" :key="topic" class="rounded-full bg-slate-700/50 px-3 py-0.5 text-[11px] font-mono font-medium text-slate-300">
+                      {{ topic }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-        </section>
+          </section>
 
-        <!-- FOOTER -->
-        <footer class="text-xs text-slate-500 pb-16">
-          <p>
-            Portofolio Nur Izdihar Idris Yunus — Diintegrasikan dengan GitHub REST API.
-          </p>
-        </footer>
+          <!-- FOOTER -->
+          <footer class="text-xs text-slate-500 pb-16 border-t border-slate-800/80 pt-6">
+            <p>
+              Portofolio Nur Izdihar Idris Yunus — Terhubung otomatis dengan GitHub REST API.
+            </p>
+          </footer>
 
-      </main>
+        </main>
 
+      </div>
     </div>
   </div>
 
@@ -167,6 +217,57 @@
         const loading = ref(true);
         const error = ref(null);
         const activeSection = ref('about');
+
+        // Mouse Spotlight State
+        const mouseX = ref(0);
+        const mouseY = ref(0);
+
+        const updateSpotlight = (e) => {
+          mouseX.value = e.clientX;
+          mouseY.value = e.clientY;
+        };
+
+        // Typing Effect State
+        const roles = [
+          'Fresh Graduate Sarjana Komputer',
+          'IT Support & Troubleshooting',
+          'Software & Web Developer',
+          'Database Management'
+        ];
+        const currentRole = ref('');
+        let roleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        const typeEffect = () => {
+          const targetText = roles[roleIndex];
+          if (isDeleting) {
+            currentRole.value = targetText.substring(0, charIndex - 1);
+            charIndex--;
+          } else {
+            currentRole.value = targetText.substring(0, charIndex + 1);
+            charIndex++;
+          }
+
+          let typingSpeed = isDeleting ? 40 : 80;
+
+          if (!isDeleting && charIndex === targetText.length) {
+            typingSpeed = 2000; // Pause di akhir kata
+            isDeleting = true;
+          } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            roleIndex = (roleIndex + 1) % roles.length;
+            typingSpeed = 500;
+          }
+
+          setTimeout(typeEffect, typingSpeed);
+        };
+
+        const skills = ref([
+          'PHP', 'JavaScript', 'Java', 'Python', 'C#', 
+          'MySQL', 'PostgreSQL', 'Tailwind CSS', 'Vue.js', 
+          'Troubleshooting IT', 'Infrastruktur Sistem'
+        ]);
 
         const fetchProjects = async () => {
           try {
@@ -187,7 +288,6 @@
           return name.replace(/[-_]/g, ' ');
         };
 
-        // Perbaikan Scrollspy agar navigasi aktif secara akurat saat di-scroll
         const setupObserver = () => {
           const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -207,9 +307,22 @@
 
         onMounted(() => {
           fetchProjects();
+          typeEffect();
         });
 
-        return { githubUsername, projects, loading, error, activeSection, formatTitle };
+        return { 
+          githubUsername, 
+          projects, 
+          loading, 
+          error, 
+          activeSection, 
+          formatTitle,
+          mouseX,
+          mouseY,
+          updateSpotlight,
+          currentRole,
+          skills
+        };
       }
     }).mount('#app');
   </script>
