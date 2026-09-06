@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Manajemen Layanan - Portofolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800">
+
+  <div id="app" class="min-h-screen flex flex-col">
+    <header class="bg-indigo-600 text-white p-4 shadow-md flex justify-between items-center">
+      <h1 class="text-xl font-bold tracking-wide">ServiceHub | Dashboard Portofolio</h1>
+      <span class="bg-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-400">Live Demo (No Login Required)</span>
+    </header>
+
+    <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <p class="text-xs font-semibold text-slate-400 uppercase">Total Pesanan</p>
+          <p class="text-3xl font-extrabold text-slate-800 mt-1">{{ services.length }}</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <p class="text-xs font-semibold text-slate-400 uppercase">Status Selesai</p>
+          <p class="text-3xl font-extrabold text-emerald-600 mt-1">{{ completedCount }}</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <p class="text-xs font-semibold text-slate-400 uppercase">Status Proses</p>
+          <p class="text-3xl font-extrabold text-amber-500 mt-1">{{ pendingCount }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between gap-3">
+        <input 
+          v-model="searchQuery" 
+          type="text" 
+          placeholder="Cari nama pelanggan atau layanan..." 
+          class="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+        />
+        <button 
+          @click="showModal = true" 
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+          + Tambah Pesanan Baru
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase">
+            <tr>
+              <th class="p-4">Pelanggan</th>
+              <th class="p-4">Layanan</th>
+              <th class="p-4">Status</th>
+              <th class="p-4 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-sm">
+            <tr v-for="item in filteredServices" :key="item.id" class="hover:bg-slate-50 transition">
+              <td class="p-4 font-medium text-slate-800">{{ item.customer }}</td>
+              <td class="p-4 text-slate-600">{{ item.serviceType }}</td>
+              <td class="p-4">
+                <span 
+                  :class="item.status === 'Selesai' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                  class="px-2.5 py-1 rounded-full text-xs font-semibold">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td class="p-4 text-center space-x-2">
+                <button @click="toggleStatus(item.id)" class="text-xs text-indigo-600 hover:underline">Ubah Status</button>
+                <button @click="deleteService(item.id)" class="text-xs text-rose-600 hover:underline">Hapus</button>
+              </td>
+            </tr>
+            <tr v-if="filteredServices.length === 0">
+              <td colspan="4" class="p-6 text-center text-slate-400">Tidak ada data layanan ditemukan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-lg space-y-4">
+        <h3 class="text-lg font-bold text-slate-800">Tambah Pesanan Baru</h3>
+        <form @submit.prevent="addService" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pelanggan</label>
+            <input v-model="newService.customer" type="text" required class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Layanan</label>
+            <input v-model="newService.serviceType" type="text" required class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" @click="showModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-600 hover:bg-slate-50">Batal</button>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted, watch } = Vue;
+
+    createApp({
+      setup() {
+        const showModal = ref(false);
+        const searchQuery = ref('');
+        const services = ref([
+          { id: 1, customer: 'Budi Santoso', serviceType: 'Cuci Otomatis + Wax', status: 'Proses' },
+          { id: 2, customer: 'Siti Rahma', serviceType: 'Pembersihan Interior', status: 'Selesai' },
+          { id: 3, customer: 'Andi Wijaya', serviceType: 'Detailing Mesin', status: 'Proses' }
+        ]);
+
+        const newService = ref({ customer: '', serviceType: '', status: 'Proses' });
+
+        // Simpan & Ambil data dari localStorage
+        onMounted(() => {
+          const saved = localStorage.getItem('portfolio_services');
+          if (saved) services.value = JSON.parse(saved);
+        });
+
+        watch(services, (newVal) => {
+          localStorage.setItem('portfolio_services', JSON.stringify(newVal));
+        }, { deep: true });
+
+        // Computed Properties
+        const filteredServices = computed(() => {
+          return services.value.filter(s => 
+            s.customer.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            s.serviceType.toLowerCase().includes(searchQuery.value.toLowerCase())
+          );
+        });
+
+        const completedCount = computed(() => services.value.filter(s => s.status === 'Selesai').length);
+        const pendingCount = computed(() => services.value.filter(s => s.status === 'Proses').length);
+
+        // Methods
+        const addService = () => {
+          services.value.push({
+            id: Date.now(),
+            customer: newService.value.customer,
+            serviceType: newService.value.serviceType,
+            status: 'Proses'
+          });
+          newService.value = { customer: '', serviceType: '', status: 'Proses' };
+          showModal.value = false;
+        };
+
+        const toggleStatus = (id) => {
+          const item = services.value.find(s => s.id === id);
+          if (item) item.status = item.status === 'Selesai' ? 'Proses' : 'Selesai';
+        };
+
+        const deleteService = (id) => {
+          services.value = services.value.filter(s => s.id !== id);
+        };
+
+        return {
+          services,
+          showModal,
+          searchQuery,
+          newService,
+          filteredServices,
+          completedCount,
+          pendingCount,
+          addService,
+          toggleStatus,
+          deleteService
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
